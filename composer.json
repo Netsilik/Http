@@ -1,0 +1,22 @@
+{
+    "name": "Netsilik/Http",
+    "description": "Http helper class",
+    "keywords": ["Http"],
+    "type": "library",
+    "license": "EUPL-1.1",
+    "homepage": "https://gitlab.com/Netsilik/Http",
+    "authors": [
+        {
+            "name": "Jacco-V",
+            "role": "Developer",
+            "homepage": "http://netsilik.nl"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^5.4 || ^7.0"
+    }
+    "autoload": {
+        "psr-4": { "Netsilik\\Lib\\": "src/" }
+    }
+}

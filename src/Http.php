@@ -20,7 +20,7 @@ class Http {
 			list($username, $password) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));	
 		}
 		
-		return ['username' => $username, 'password' => $password];
+		return [$username, $password];
 	}
 	 
 	/**

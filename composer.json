@@ -1,6 +1,6 @@
 {
     "name": "netsilik/http",
-    "description": "Http helper class",
+    "description": "Basic HTTP Status Code helper class.",
     "keywords": ["Http"],
     "type": "library",
     "license": "EUPL-1.1",

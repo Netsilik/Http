@@ -9,6 +9,20 @@ namespace Netsilik\Lib;
 
 class Http {
 	 
+	public static function getBasicAuthCredentials() {
+		$username = null;
+		$password = null;
+		
+		if (isset($_SERVER['PHP_AUTH_USER'])) { // mod_php
+			$username = $_SERVER['PHP_AUTH_USER'];
+			$password = $_SERVER['PHP_AUTH_PW'];
+		} elseif (isset($_SERVER['HTTP_AUTHORIZATION']) && 0 === strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']), 'basic')) { // most other servers
+			list($username, $password) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));	
+		}
+		
+		return ['username' => $username, 'password' => $password];
+	}
+	 
 	/**
 	 * Display HTTP error 
 	 * @param int $httpStatusCode The HTTP 1.1 response code to send (either 403: Forbidden, 404: Not Found, 405: Method Not Allowed, 500: Internal Server Error or 503: Service Unavailable)
@@ -25,7 +39,23 @@ class Http {
 			$debugInfo = '';
 		}
 		
-		if ($httpStatusCode == 403) {
+		if ($httpStatusCode == 401) {
+			if ($setHeader) {
+				header('HTTP/1.1 401 Unauthorized');
+				header('WWW-Authenticate: Basic realm="Auth Required"');
+			}
+			echo "<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n";
+			echo "<html><head>\n";
+			echo "<title>401 Unauthorized</title>\n";
+			echo "</head><body>\n";
+			echo "<h1>Unauthorized</h1>\n";
+			echo $debugInfo;
+			echo "<p>This server could not verify that you are authorized to accessthe document requested. Either you supplied the wrong credentials (e.g., bad password), or your browser does't understand how to supply the credentials required.</p>\n";
+			echo "<hr>\n";
+			echo $_SERVER['SERVER_SIGNATURE']."\n";
+			echo "</body></html>\n";
+			exit(0);
+		} elseif ($httpStatusCode == 403) {
 			if ($setHeader) { header('HTTP/1.1 403 Forbidden'); }
 			echo "<!DOCTYPE html PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n";
 			echo "<html><head>\n";
@@ -91,7 +121,7 @@ class Http {
 			echo "</body></html>\n";
 			exit(0);
 		} else {
-			trigger_error('Invalid http error code, valid redirect codes are: 403 (Forbidden), 404 (Not Found), 405 (Method Not Allowed), 500 (Internal Server Error) and 503 (Service Unavailable).', E_USER_ERROR);
+			trigger_error('Invalid http error code, valid redirect codes are: 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 405 (Method Not Allowed), 500 (Internal Server Error) and 503 (Service Unavailable).', E_USER_ERROR);
 		}
 	}
 	
